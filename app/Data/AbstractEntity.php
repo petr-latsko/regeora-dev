@@ -20,7 +20,7 @@ abstract class AbstractEntity
     /**
      * For test & debug
      */
-    public function dump()
+    public function dump(): void
     {
         if (function_exists('dump')) {
             dump($this);

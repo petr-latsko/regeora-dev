@@ -59,7 +59,10 @@ class XmlParserService implements SourceParser
     {
         $data = [];
         if ($this->xml instanceof SimpleXMLElement) {
-            $data = json_decode(json_encode((array)$this->xml, 1));
+            $data = json_decode(
+                json_encode((array)$this->xml),
+                true
+            );
         }
         return $data;
     }

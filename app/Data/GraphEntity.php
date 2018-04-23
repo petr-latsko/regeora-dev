@@ -32,7 +32,7 @@ class GraphEntity extends AbstractEntity
     /**
      * @return array
      */
-    public function getEventStat()
+    public function getEventStat(): array
     {
         $stat = [
             'countEvents' => 0,
@@ -53,17 +53,16 @@ class GraphEntity extends AbstractEntity
 
     /**
      * @param array $times as format ['from' => 'H:i', 'till' => 'H:i']
-     * @param bool  $withNames
-     * @return Collection
+     * @return StopEntity[]|Collection
      */
-    public function getEventStops(array $times = ['from' => '', 'till' => ''], bool $withNames = true)
+    public function getEventStops(array $times = ['from' => '', 'till' => '']): Collection
     {
         $stops = new Collection;
 
-        $this->getSmenas()->each(function ($smena) use ($stops, $times, $withNames) {
-            return $smena->getEvents()->each(function ($event, $idxEvent) use ($smena, $stops, $times, $withNames) {
+        $this->getSmenas()->each(function ($smena) use ($stops, $times) {
+            return $smena->getEvents()->each(function ($event, $idxEvent) use ($smena, $stops, $times) {
                 if ($event->getEvId() === EventEntity::INTERNAL_EV_ID) {
-                    return $event->getStops()->each(function ($stop) use ($smena, $idxEvent, $stops, $times, $withNames) {
+                    return $event->getStops()->each(function ($stop) use ($smena, $idxEvent, $stops, $times) {
 
                         $condition = true;
                         if (! empty($times['from']) && ! empty($times['till'])) {
@@ -94,7 +93,7 @@ class GraphEntity extends AbstractEntity
     /**
      * @param SmenaEntity $smena
      */
-    public function setSmena(SmenaEntity $smena)
+    public function setSmena(SmenaEntity $smena): void
     {
         $this->smenas->put($smena->getNum(), $smena);
         $this->smenas->sortKeys();
@@ -111,7 +110,7 @@ class GraphEntity extends AbstractEntity
     /**
      * @param EventEntity $event
      */
-    public function setEvent(EventEntity $event)
+    public function setEvent(EventEntity $event): void
     {
         $this->smenas->last()->setEvent($event);
     }

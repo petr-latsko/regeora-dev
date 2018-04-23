@@ -36,7 +36,7 @@ class StopEntity extends AbstractEntity
      */
     public function findName(): ?string
     {
-        $row = DB::table('StopPoints')->where('external_id', $this->getStId())->first();
+        $row = DB::table('stop_points')->where('external_id', $this->getStId())->first();
 
         return ! $row ? null : $row->name;
     }
@@ -44,7 +44,7 @@ class StopEntity extends AbstractEntity
     /**
      * @param array $meta
      */
-    public function setMeta(array $meta)
+    public function setMeta(array $meta): void
     {
         $this->meta = $meta;
     }

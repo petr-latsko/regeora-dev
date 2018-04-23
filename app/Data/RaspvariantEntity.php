@@ -60,7 +60,7 @@ class RaspvariantEntity extends AbstractEntity
     /**
      * @param GraphEntity $graph
      */
-    public function setGraph(GraphEntity $graph)
+    public function setGraph(GraphEntity $graph): void
     {
         $num = $graph->getNum();
         if (! $this->graphs->has($num)) {
@@ -69,7 +69,6 @@ class RaspvariantEntity extends AbstractEntity
             $this->graphs->get($num)->setSmena($graph->getSmenas()->first());
             $this->graphs->sortKeys();
         }
-
     }
 
     /**

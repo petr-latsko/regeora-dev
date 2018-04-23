@@ -35,6 +35,6 @@ class DatabaseSeeder extends Seeder
             });
         });
 
-        DB::table('StopPoints')->insert($inserts->values()->toArray());
+        DB::table('stop_points')->insert($inserts->values()->toArray());
     }
 }

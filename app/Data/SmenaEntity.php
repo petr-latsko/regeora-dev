@@ -92,7 +92,7 @@ class SmenaEntity extends AbstractEntity
     /**
      * @param EventEntity $event
      */
-    public function setEvent(EventEntity $event)
+    public function setEvent(EventEntity $event): void
     {
         $this->events->push($event);
     }
@@ -100,7 +100,7 @@ class SmenaEntity extends AbstractEntity
     /**
      * @return EventEntity[]|Collection
      */
-    public function getEvents()
+    public function getEvents(): Collection
     {
         return $this->events;
     }

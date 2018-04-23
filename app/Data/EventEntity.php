@@ -65,7 +65,7 @@ class EventEntity extends AbstractEntity
     /**
      * @param StopEntity $stop
      */
-    public function setStop(StopEntity $stop)
+    public function setStop(StopEntity $stop): void
     {
         $this->stops->push($stop);
     }
@@ -73,7 +73,7 @@ class EventEntity extends AbstractEntity
     /**
      * @return StopEntity[]|Collection
      */
-    public function getStops()
+    public function getStops(): Collection
     {
         return $this->stops;
     }

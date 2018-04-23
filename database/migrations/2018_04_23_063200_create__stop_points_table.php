@@ -13,7 +13,7 @@ class CreateStopPointsTable extends Migration
      */
     public function up()
     {
-        Schema::create('StopPoints', function (Blueprint $table) {
+        Schema::create('stop_points', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('external_id')->unique();
             $table->string('name');
@@ -27,6 +27,6 @@ class CreateStopPointsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('StopPoints');
+        Schema::dropIfExists('stop_points');
     }
 }
