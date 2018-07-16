@@ -4,8 +4,10 @@ namespace App\Data;
 
 use Illuminate\Support\Collection;
 
-class SmenaEntity extends AbstractEntity
+class ShiftEntity extends AbstractEntity
 {
+    const CHILD_MAPPING = [];
+
     /**
      * @var EventEntity[]|Collection
      */
@@ -77,7 +79,7 @@ class SmenaEntity extends AbstractEntity
     protected $lineEnd;
 
     /**
-     * SmenaEntity constructor.
+     * ShiftEntity constructor.
      * @param array $attributes
      */
     public function __construct(array $attributes)
@@ -90,9 +92,17 @@ class SmenaEntity extends AbstractEntity
     }
 
     /**
+     * @param \App\Data\AbstractEntity $childEntity
+     */
+    public function setChildEntity(AbstractEntity $childEntity): void
+    {
+        $this->setEventEntity($childEntity);
+    }
+
+    /**
      * @param EventEntity $event
      */
-    public function setEvent(EventEntity $event): void
+    public function setEventEntity(EventEntity $event): void
     {
         $this->events->push($event);
     }
@@ -207,5 +217,22 @@ class SmenaEntity extends AbstractEntity
     public function getLineEnd(): string
     {
         return $this->lineEnd;
+    }
+
+    /**
+     * Get mapping for children entities
+     */
+    public function getMapping(): array
+    {
+        return self::CHILD_MAPPING;
+    }
+
+    /**
+     * Get children entities
+     * @return EventEntity[]|Collection
+     */
+    public function getChildren(): Collection
+    {
+        return $this->getEvents();
     }
 }

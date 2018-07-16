@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
         $faker = app(Faker\Generator::class);
 
         $inserts = new Collection;
-        $data->getGraphs()->each(function ($graph) use ($inserts, $faker) {
-            $graph->getSmenas()->each(function ($smena) use ($inserts, $faker) {
-                $smena->getEvents()->each(function ($event) use ($inserts, $faker) {
+        $data->getSchedules()->each(function ($schedule) use ($inserts, $faker) {
+            $schedule->getShifts()->each(function ($shift) use ($inserts, $faker) {
+                $shift->getEvents()->each(function ($event) use ($inserts, $faker) {
                     if ($event->getEvId() === EventEntity::INTERNAL_EV_ID) {
                         $event->getStops()->each(function ($stop) use ($inserts, $faker) {
                             if (! $inserts->has($stop->getStId())) {

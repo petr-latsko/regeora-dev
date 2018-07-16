@@ -2,6 +2,8 @@
 
 namespace App\Data;
 
+use Illuminate\Support\Collection;
+
 abstract class AbstractEntity
 {
     /**
@@ -16,6 +18,24 @@ abstract class AbstractEntity
             }
         }
     }
+
+    /**
+     * Get mapping for children entities
+     * @return array
+     */
+    abstract public function getMapping(): array;
+
+    /**
+     * Get children entities
+     * @return Collection
+     */
+    abstract public function getChildren(): Collection;
+
+    /**
+     * Set child entity
+     * @param AbstractEntity $childEntity
+     */
+    abstract public function setChildEntity(AbstractEntity $childEntity): void;
 
     /**
      * For test & debug

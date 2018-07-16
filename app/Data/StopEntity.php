@@ -2,12 +2,17 @@
 
 namespace App\Data;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\StopPoints;
+use Illuminate\Support\Collection;
 
 class StopEntity extends AbstractEntity
 {
+    const CHILD_MAPPING = [
+        'meta' => 'MetaCollection',
+    ];
+
     /**
-     * @var array
+     * @var \App\Data\MetaCollection
      */
     protected $meta;
 
@@ -31,28 +36,44 @@ class StopEntity extends AbstractEntity
      */
     protected $kp;
 
+    /**
+     * @var StopPoints[]|Collection
+     */
+    protected static $repository;
+
+    /**
+     * StopEntity constructor.
+     * @param array $attributes
+     */
+    public function __construct(array $attributes)
+    {
+        parent::__construct($attributes);
+
+        self::$repository = self::$repository ?? StopPoints::all()->keyBy('external_id');
+    }
+
     /*
-     * Find the stop name in DB
+     * Find the stop name
      */
     public function findName(): ?string
     {
-        $row = DB::table('stop_points')->where('external_id', $this->getStId())->first();
+        $row = self::$repository->get($this->getStId());
 
-        return ! $row ? null : $row->name;
+        return $row->name ?? null;
     }
 
     /**
-     * @param array $meta
+     * @param \App\Data\MetaCollection $meta
      */
-    public function setMeta(array $meta): void
+    public function setMetaCollection(MetaCollection $meta): void
     {
         $this->meta = $meta;
     }
 
     /**
-     * @return array|$meta[]
+     * @return \App\Data\MetaCollection
      */
-    public function getMeta(): array
+    public function getMeta(): MetaCollection
     {
         return $this->meta;
     }
@@ -87,5 +108,31 @@ class StopEntity extends AbstractEntity
     public function isKp(): bool
     {
         return $this->kp;
+    }
+
+    /**
+     * Get mapping for children entities
+     */
+    public function getMapping(): array
+    {
+        return self::CHILD_MAPPING;
+    }
+
+    /**
+     * Get children entities
+     * @return Collection
+     */
+    public function getChildren(): Collection
+    {
+        return $this->getMeta();
+    }
+
+    /**
+     * Set children entities
+     * @param AbstractEntity $childEntity
+     */
+    public function setChildEntity(AbstractEntity $childEntity): void
+    {
+        // Have no children
     }
 }

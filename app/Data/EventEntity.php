@@ -6,6 +6,10 @@ use Illuminate\Support\Collection;
 
 class EventEntity extends AbstractEntity
 {
+    const CHILD_MAPPING = [
+        'stop'  => 'StopEntity',
+    ];
+
     /**
      * Internal events id
      */
@@ -63,9 +67,17 @@ class EventEntity extends AbstractEntity
     }
 
     /**
+     * @param \App\Data\AbstractEntity $childEntity
+     */
+    public function setChildEntity(AbstractEntity $childEntity): void
+    {
+        $this->setStopEntity($childEntity);
+    }
+
+    /**
      * @param StopEntity $stop
      */
-    public function setStop(StopEntity $stop): void
+    public function setStopEntity(StopEntity $stop): void
     {
         $this->stops->push($stop);
     }
@@ -132,5 +144,22 @@ class EventEntity extends AbstractEntity
     public function getDuration(): int
     {
         return $this->duration;
+    }
+
+    /**
+     * Get mapping for children entities
+     */
+    public function getMapping(): array
+    {
+        return self::CHILD_MAPPING;
+    }
+
+    /**
+     * Get children entities
+     * @return StopEntity[]|Collection
+     */
+    public function getChildren(): Collection
+    {
+        return $this->getStops();
     }
 }

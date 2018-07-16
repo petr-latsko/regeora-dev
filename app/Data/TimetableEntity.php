@@ -4,12 +4,16 @@ namespace App\Data;
 
 use Illuminate\Support\Collection;
 
-class RaspvariantEntity extends AbstractEntity
+class TimetableEntity extends AbstractEntity
 {
+    const CHILD_MAPPING = [
+        'graph'  => 'ScheduleEntity',
+    ];
+
     /**
-     * @var GraphEntity[]|Collection
+     * @var ScheduleEntity[]|Collection
      */
-    protected $graphs;
+    protected $schedules;
 
     /**
      * @var string
@@ -54,29 +58,39 @@ class RaspvariantEntity extends AbstractEntity
     {
         parent::__construct($attributes);
 
-        $this->graphs = new Collection;
+        $this->schedules = new Collection;
     }
 
     /**
-     * @param GraphEntity $graph
+     * @param \App\Data\AbstractEntity $childEntity
      */
-    public function setGraph(GraphEntity $graph): void
+    public function setChildEntity(AbstractEntity $childEntity): void
     {
-        $num = $graph->getNum();
-        if (! $this->graphs->has($num)) {
-            $this->graphs->put($num, $graph);
+        $this->setScheduleEntity($childEntity);
+    }
+
+    /**
+     * @param ScheduleEntity $schedule
+     */
+    public function setScheduleEntity(ScheduleEntity $schedule): void
+    {
+        $num = $schedule->getNum();
+        if (! $this->schedules->has($num)) {
+            $this->schedules->put($num, $schedule);
         } else {
-            $this->graphs->get($num)->setSmena($graph->getSmenas()->first());
-            $this->graphs->sortKeys();
+            $schedule->getShifts()->each(function (ShiftEntity $shift) use ($num) {
+                $this->schedules->get($num)->setShiftEntity($shift);
+            });
+            $this->schedules->sortKeys();
         }
     }
 
     /**
-     * @return GraphEntity[]|Collection
+     * @return ScheduleEntity[]|Collection
      */
-    public function getGraphs(): Collection
+    public function getSchedules(): Collection
     {
-        return $this->graphs;
+        return $this->schedules;
     }
 
     /**
@@ -133,5 +147,22 @@ class RaspvariantEntity extends AbstractEntity
     public function getMrNum(): string
     {
         return $this->mr_num;
+    }
+
+    /**
+     * Get mapping for children entities
+     */
+    public function getMapping(): array
+    {
+        return self::CHILD_MAPPING;
+    }
+
+    /**
+     * Get children entities
+     * @return ScheduleEntity[]|Collection
+     */
+    public function getChildren(): Collection
+    {
+        return $this->getSchedules();
     }
 }

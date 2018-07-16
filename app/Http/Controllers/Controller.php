@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\ScheduleEntity;
 use App\Services\DataContractService;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -12,6 +13,7 @@ class Controller extends BaseController
      * Application Index page.
      * @param \Illuminate\Http\Request $request
      * @param DataContractService      $dataContractService
+     * @throws \App\Exceptions\EntityFactoryException
      */
     public function index(Request $request, DataContractService $dataContractService)
     {
@@ -30,16 +32,17 @@ class Controller extends BaseController
         $data = $dataContractService->get();
         $data->dump();
 
-        $graph = $data->getGraphs()->first();
+        /** @var ScheduleEntity $schedule */
+        $schedule = $data->getChildren()->first();
 
-        $eventsStat = $graph->getEventStat();
+        $eventsStat = $schedule->getStatisticEvents();
         dump($eventsStat);
 
         $params = [
             'from' => $request->input('from', '12:00'),
             'till' => $request->input('till', '13:00'),
         ];
-        $eventsStops = $graph->getEventStops($params);
+        $eventsStops = $schedule->getStopsList($params);
         dump($eventsStops);
 
         dump(

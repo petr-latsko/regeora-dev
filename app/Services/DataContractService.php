@@ -3,16 +3,21 @@
 namespace App\Services;
 
 use App\Data\AbstractEntity;
-use App\Data\RaspvariantEntity;
+use App\Data\EntityFactory;
 use App\Services\Interfaces\SourceParser;
 use SimpleXMLElement;
 
 class DataContractService
 {
     /**
-     * @var SourceParser
+     * @var \App\Services\Interfaces\SourceParser
      */
     private $parser;
+
+    /**
+     * @var \App\Data\EntityFactory
+     */
+    private $factory;
 
     /**
      * @var SimpleXMLElement
@@ -26,19 +31,23 @@ class DataContractService
 
     /**
      * DataTransferService constructor.
-     * @param SourceParser $parser
+     * @param \App\Services\Interfaces\SourceParser $parser
+     * @param \App\Data\EntityFactory               $factory
      */
-    public function __construct(SourceParser $parser)
+    public function __construct(SourceParser $parser, EntityFactory $factory)
     {
         $this->parser = $parser;
+        $this->factory = $factory;
     }
 
     /**
      * @return AbstractEntity
+     * @throws \App\Exceptions\EntityFactoryException
      */
     public function get(): AbstractEntity
     {
         $this->load()->prepare();
+
         return $this->data;
     }
 
@@ -48,39 +57,47 @@ class DataContractService
     protected function load(): self
     {
         $this->xml = $this->xml ?? $this->parser->parse()->get();
+
         return $this;
     }
 
     /**
      * Preparing and create objects by contract with entities
+     * @throws \App\Exceptions\EntityFactoryException
      */
     protected function prepare(): void
     {
-        $this->data = $this->data
-            ?? $this->iterate(
-                $this->xml->children(),
-                new RaspvariantEntity($this->attributesToArray($this->xml))
-            );
+        $rootEntity = $this->factory->build(
+            EntityFactory::ROOT_ENTITY_CLASS,
+            $this->attributesToArray($this->xml)
+        );
+
+        $this->data = $this->data ?? $this->iterate($rootEntity, $this->xml->children());
     }
 
     /**
-     * @param SimpleXMLElement $element
-     * @param AbstractEntity   $node
+     * @param AbstractEntity   $entity
+     * @param SimpleXMLElement $xmlChildren
      * @return AbstractEntity
+     * @throws \App\Exceptions\EntityFactoryException
      */
-    protected function iterate(SimpleXMLElement $element, AbstractEntity $node): AbstractEntity
+    protected function iterate(AbstractEntity $entity, SimpleXMLElement $xmlChildren): AbstractEntity
     {
-        foreach ($element as $name => $xml) {
-            $childEntityClass = 'App\\Data\\' . ucfirst($name) . 'Entity';
-            $method = 'set' . ucfirst($name);
-            $node->$method(
-                $this->iterate(
-                    $xml->children(),
-                    new $childEntityClass($this->attributesToArray($xml))
-                )
+        $mapping = $entity->getMapping();
+
+        foreach ($xmlChildren as $name => $xmlElement) {
+
+            $childEntity = $this->factory->build(
+                $mapping[$name],
+                $this->attributesToArray($xmlElement)
+            );
+
+            $entity->setChildEntity(
+                $this->iterate($childEntity, $xmlElement->children())
             );
         }
-        return $node;
+
+        return $entity;
     }
 
     /**
